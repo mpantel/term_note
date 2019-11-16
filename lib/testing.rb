@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'method_source'
 require 'colorize'
-
+# class under test and presentation
 class MyList
 
   def initialize(a = [])
@@ -92,7 +92,8 @@ class MyList
     end
     [min, max]
   end
-
+  
+  # activate alternative implemantations
   def self.set_slow
     alias_method :min_max, :min_max_slow
   end
@@ -114,12 +115,16 @@ class MyList
 
 end
 
+# tests start here
+
+# allow tests to execute or just shown
 if ARGV[0] =~ /RUN_TESTS/
   class MyListClassTests < Test::Unit::TestCase; end
 else
   class MyListClassTests; end
 end
 
+# test specific instances
 MyList.set_slow if ARGV[0] =~ /SLOW/
 MyList.set_wrong if ARGV[0] =~ /WRONG/
 
@@ -191,7 +196,9 @@ class MyListClassTests
   end
 end
 
+# check if in presentation or testing mode
 if ARGV[0] !~ /RUN_TESTS/
+  # terminal helper
   class Term
     class << self
       attr_reader :height, :width
@@ -207,7 +214,7 @@ if ARGV[0] !~ /RUN_TESTS/
       puts "New Size: #{@height} X #{@width}"
     end
   end
-
+  # class that handles the presentation
   class Presentation
     attr_reader :current
 
@@ -225,6 +232,7 @@ if ARGV[0] !~ /RUN_TESTS/
       end
     end
 
+    # run the presentation
     def play
       while current <= size
         display_slide
@@ -245,6 +253,7 @@ if ARGV[0] !~ /RUN_TESTS/
       end
     end
 
+    # auto play and record
     def record # requires MacOS + ImageMagick
       (1..size).each do |index|
         self.current = index
@@ -362,6 +371,7 @@ if ARGV[0] !~ /RUN_TESTS/
 
     @@slide_counter = 0
 
+    # Start slide declaration
     define_slide { [
         "Unit Testing", "",
         "Πως μπορούμε να εξασφαλίσουμε την ορθότητα των προγραμμάτων;"
