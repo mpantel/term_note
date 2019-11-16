@@ -1,1 +1,1 @@
-# term-note
+# term_note
