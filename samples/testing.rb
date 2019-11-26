@@ -256,7 +256,7 @@ if ARGV[0] !~ /RUN_TESTS/
         sleep 1
         `screencapture -x -o -l$(osascript -e 'tell app "Terminal" to id of window 1') slide_#{"%04d" % (index)}.png`
       end
-      `convert slide_*.png #{$0.split('.').first}_presentation_recorded.pdf`
+      `convert slide_*.png #{$0.split('.').first}_presentation_recorded#{ ARGV[0]=~/LONG/ ? '_long':''}.pdf`
     end
 
     def print_help
@@ -325,7 +325,7 @@ if ARGV[0] !~ /RUN_TESTS/
     ensure
       pager, prompt = if ARGV[0] !~ /RECORD/
                         ["Slide: %d / %d >" % [current, size],
-                          "b: back one,<number>: goto slide, <enter>: next, h,?: help, q: quit"]
+                         "b: back one,<number>: goto slide, <enter>: next, h,?: help, q: quit"]
                       else
                         current_index = @@slides_to_record.find_index(current)
                         previous_shown = (current_index == 0 ? 0 : @@slides_to_record[current_index - 1]) + 1
@@ -367,7 +367,7 @@ if ARGV[0] !~ /RUN_TESTS/
     def self.define_slide(record: true, include: 0, variant: nil, class_name: nil, &contents)
       @@slide_counter += 1
       slide = proc { |number| self.send("slide_#{number}".to_sym) }
-      @@slides_to_record << @@slide_counter if record
+      @@slides_to_record << @@slide_counter if record || ARGV[0]=~/LONG/
       define_method "slide_#{@@slide_counter}".to_sym do
         instance_eval("#{class_name}.send(:#{variant.to_s})") if variant
         current_number = __method__.to_s.split('_').last.to_i
@@ -454,14 +454,14 @@ if ARGV[0] !~ /RUN_TESTS/
     define_slide(record: false, include: -2) { ["",
                                                 "Low Level: Machine Code, Assembly"] }
     define_slide(include: -1) { ["",
-                                 "High Level: Java, Javascript, C/C++, ADA, Pascal"] }
+                                 "High Level: Java, Javascript, C/C++, ADA, Pascal..."] }
 
     define_slide(include: -1) { ["", "", "Compiled / Interpreted"] }
-    define_slide(record: false, include: -2) { ["", "", "Compiled: Java, Javascript, C/C++, ADA, Pascal"] }
+    define_slide(record: false, include: -2) { ["", "", "Compiled: Java, C/C++, ADA, Pascal..."] }
     define_slide(include: -1) { ["", "", "Interpreted: Javascript, Python, Ruby . . ."] }
 
     define_slide(record: false) {
-      ["Γλώσσες Προγραμματισμού Python vs Ruby", "", "",
+      ["Γλώσσες Προγραμματισμού - Python vs Ruby", "", "",
       ] }
     define_slide(include: -1) { ["print \"Hello, world!\"#CODE"] }
     define_slide(include: -2) {
@@ -597,8 +597,8 @@ if ARGV[0] !~ /RUN_TESTS/
     define_slide(record: false) do  ["Η παρουσίαση αυτή έχει υλοποιηθεί στη γλώσσα Ruby...",""] end
     define_slide(record: false,include: -1) do  ["...εκτελείται ενώ παρουσιάζεται...#blink",""] end
     define_slide(include: -1) do  [
-                                     "είναι διαθέσιμη από το ","",
-                                     "https://github.com/mpantel/term_note/blob/master/samples","",""] end
+        "είναι διαθέσιμη από το ","",
+        "https://github.com/mpantel/term_note/blob/master/samples","",""] end
     define_slide(record: false,include: -1) do  ["Ευχαριστώ για τη προσοχή σας..."] end
 
   end
