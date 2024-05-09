@@ -28,20 +28,20 @@ class Web
   def url(url, force = false,format: :wide)
     size = format == :wide ? [1600, 900] : [1600, 1200]
     filename = url.tr(':/?#', '_')
-    if force || !File.exist?("#{filename}.six")
-      puts 'loading...'
+    if force || !File.exist?("#{filename}.png")
+      #puts 'loading...'
       uri = URI(url)
       Capybara.current_driver = "selenium-firefox".to_sym
       Capybara.app_host = [uri.scheme, '://', uri.host, blank?(uri.port) ? "" : ":", uri.port].join
       page.driver.browser.manage.window.resize_to(*size)
 
       visit [uri.path, blank?(uri.query) ? "" : "?#{uri.query}", blank?(uri.fragment) ? "" : "##{uri.fragment}"].join
+      sleep 2
       page.save_screenshot("#{filename}.png")
-      `convert #{filename}.png #{filename}.six`
-
       Capybara.current_session.driver.quit
     end
     filename
   end
+
 
 end

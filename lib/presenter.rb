@@ -81,23 +81,29 @@ class Presenter
     slides.size
   end
 
+  def png_to_sixel(filename)
+    `convert #{filename}.png #{filename}.six`
+  end
+
   def display_slide
     slide = self.send(@slides[@current - 1])
     content, format = slide&.first&.split('#')
-    if format =~ /SNAPSHOT/
-      filename = @web.url(content, format: :square)
+    if format =~ /SNAPSHOT|PNG/ # works on iTerm or sixel enabled terminals
+      filename = format =~ /SNAPSHOT/ ? @web.url(content, format: :square) : "#{presentation_name}/#{content}"
       if ARGV[0] =~ /RECORD/
         FileUtils.copy_file("#{filename}.png", "#{presentation_name}_slide_#{"%04d" % (@current)}.png")
       else
-        puts filename.center(Term.width)
+        png_to_sixel(filename) unless File.exist?("#{filename}.six")
+        puts content.center(Term.width)
         puts File.read("#{filename}.six")
+        print_pager
       end
     else
       center(slide)
-    end
-    if ARGV[0] =~ /RECORD/ && format !~ /SNAPSHOT/
-      sleep 1
-      `screencapture -x -o -l$(osascript -e 'tell app "Terminal" to id of window 1') #{presentation_name}_slide_#{"%04d" % (@current)}.png`
+      if ARGV[0] =~ /RECORD/
+        sleep 1
+        `screencapture -x -o -l$(osascript -e 'tell app "Terminal" to id of window 1') #{presentation_name}_slide_#{"%04d" % (@current)}.png`
+      end
     end
   end
 
@@ -141,15 +147,7 @@ class Presenter
     puts ["lines:", lines, "height:", Term.height, "width:", Term.width, "blank:", blank, "half:", half, "rest:", rest].join("  ")
     @current -= 1
   ensure
-    pager, prompt = if ARGV[0] !~ /RECORD/
-                      ["Slide: %d / %d >" % [current, size],
-                       "b: back one,<number>: goto slide, <enter>: next, h,?: help, q: quit"]
-                    else
-                      current_index = @@slides_to_record.find_index(current)
-                      previous_shown = (current_index == 0 ? 0 : @@slides_to_record[current_index - 1]) + 1
-                      ["Slide: #{[previous_shown, current].uniq.join(' - ')} / %d >" % @@slides_to_record.last, ""]
-                    end
-    printf prompt + pager.rjust(Term.width - prompt.size - 3)
+    print_pager
   end
 
   def run_tests(sequence)
@@ -196,4 +194,18 @@ class Presenter
 
   @@slide_counter = 0
   @@slides_to_record = []
+
+  private
+
+  def print_pager
+    pager, prompt = if ARGV[0] !~ /RECORD/
+                      ["Slide: %d / %d >" % [current, size],
+                       "b: back one,<number>: goto slide, <enter>: next, h,?: help, q: quit"]
+                    else
+                      current_index = @@slides_to_record.find_index(current)
+                      previous_shown = (current_index == 0 ? 0 : @@slides_to_record[current_index - 1]) + 1
+                      ["Slide: #{[previous_shown, current].uniq.join(' - ')} / %d >" % @@slides_to_record.last, ""]
+                    end
+    printf prompt + pager.rjust(Term.width - prompt.size - 3)
+  end
 end
