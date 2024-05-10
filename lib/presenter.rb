@@ -94,8 +94,8 @@ class Presenter
         FileUtils.copy_file("#{filename}.png", "#{presentation_name}_slide_#{"%04d" % (@current)}.png")
       else
         png_to_sixel(filename) unless File.exist?("#{filename}.six")
-        puts content.center(Term.width)
         puts File.read("#{filename}.six")
+        puts content.center(Term.width) unless format =~ /PNG/
         print_pager
       end
     else
