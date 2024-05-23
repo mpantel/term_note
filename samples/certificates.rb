@@ -5,7 +5,7 @@ class Presentation < Presenter
   define_slide { [
     "ΑΣΦΑΛΕΙΑ ΔΕΔΟΜΕΝΩΝ ΣΤΗΝ ΚΟΙΝΩΝΙΑ ΤΗΣ ΠΛΗΡΟΦΟΡΙΑΣ (8οΕξ.)", "",
     "Ψηφιακά Πιστοποιητικά και Ψηφιακές Υπογραφές","",
-    "16 Μαΐου 2024"
+    "16 & 23 Μαΐου 2024"
   ] }
 
   define_slide { ["Παντελέλης Μιχάλης#light_magenta",
@@ -333,6 +333,14 @@ class Presentation < Presenter
   define_slide { ["gov_sig_panel#PNG"] }
   define_slide { ["gov_key_usage#PNG"] }
   define_slide { ["gov_root_cert#PNG"] }
+
+
+  define_slide do
+    [ "Bonus:",
+    "Ψηφοφορία με την ψηφιακή κάλπη ΖΕΥΣ",
+      "https://zeus.grnet.gr/zeus/resources/"]
+
+  end
 
   define_slide do
     [
